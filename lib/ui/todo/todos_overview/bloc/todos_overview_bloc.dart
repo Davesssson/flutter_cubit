@@ -17,7 +17,8 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     })  : _todosRepository = todosRepository,
             super(const TodosOverviewState()) {
          on<TodosOverviewSubscriptionRequested>(_onSubscriptionRequested);
-        // on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
+         on<TodosClicked>(_todoClicked);
+         //on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
         // on<TodosOverviewTodoDeleted>(_onTodoDeleted);
         // on<TodosOverviewUndoDeletionRequested>(_onUndoDeletionRequested);
         // on<TodosOverviewFilterChanged>(_onFilterChanged);
@@ -36,12 +37,29 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
             _todosRepository.getTodos(),
             onData: (todos) => state.copyWith(
                 status: () => TodosOverviewStatus.success,
-                //todos: () => todos,
-                todos: () => [Todo(title: "title", id: "1", description: "my first description", isCompleted: false)],
+                todos: () => todos,
+                //todos: () => _mockTodos,
             ),
             onError: (_, __) => state.copyWith(
                 status: () => TodosOverviewStatus.failure,
             ),
         );
     }
+
+    Future<void> _todoClicked(
+        TodosClicked event,
+        Emitter<TodosOverviewState> emit,
+        ) async {
+        print(" haha buzi vagy ${event.todo.title}");
+    }
 }
+
+
+List<Todo> _mockTodos = [
+    Todo(title: "title1", id: "1", description: "my first description1", isCompleted: false),
+    Todo(title: "title2", id: "2", description: "my first description2", isCompleted: false),
+    Todo(title: "title3", id: "3", description: "my first description3", isCompleted: false),
+    Todo(title: "title4", id: "4", description: "my first description4", isCompleted: true),
+    Todo(title: "title5", id: "5", description: "my first description5", isCompleted: false),
+    Todo(title: "title6", id: "6", description: "my first description6", isCompleted: false),
+];
