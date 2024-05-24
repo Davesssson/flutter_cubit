@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myfirstflutterproject/Repositories/todos_repository.dart';
 import 'package:myfirstflutterproject/ui/dashboard/dashboard.dart';
 
+import '../l10n/app_localizations.dart';
+
 
 
 
@@ -27,6 +29,8 @@ class AppView extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates ,
+      supportedLocales: AppLocalizations.supportedLocales,
       home:  DashboardPage(),
     );
 

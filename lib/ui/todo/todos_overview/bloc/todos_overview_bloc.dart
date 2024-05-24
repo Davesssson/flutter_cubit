@@ -36,7 +36,8 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
             _todosRepository.getTodos(),
             onData: (todos) => state.copyWith(
                 status: () => TodosOverviewStatus.success,
-                todos: () => todos,
+                //todos: () => todos,
+                todos: () => [Todo(title: "title", id: "1", description: "my first description", isCompleted: false)],
             ),
             onError: (_, __) => state.copyWith(
                 status: () => TodosOverviewStatus.failure,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myfirstflutterproject/Repositories/todos_repository.dart';
+import 'package:myfirstflutterproject/l10n/l10n.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/bloc/todos_overview_bloc.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/widgets/todo_list_tile.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/widgets/todos_overview_filter_button.dart';
@@ -27,10 +28,10 @@ class TodosOverviewView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text("l10n.todosOverviewAppBarTitle"),
+        title: Text(l10n.todosOverviewAppBarTitle),
         actions: const [
           TodosOverviewFilterButton(),
           TodosOverviewOptionsButton(),
@@ -47,7 +48,7 @@ class TodosOverviewView extends StatelessWidget {
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text("l10n.todosOverviewErrorSnackbarText"),
+                      content: Text(l10n.todosOverviewErrorSnackbarText),
                     ),
                   );
               }
@@ -65,10 +66,10 @@ class TodosOverviewView extends StatelessWidget {
                 ..showSnackBar(
                   SnackBar(
                     content: Text(
-                      "l10n.todosOverviewTodoDeletedSnackbarText(deletedTodo.title,)",
+                      l10n.todosOverviewTodoDeletedSnackbarText(deletedTodo.title,),
                     ),
                     action: SnackBarAction(
-                      label: "l10n.todosOverviewUndoDeletionButtonText",
+                      label: l10n.todosOverviewUndoDeletionButtonText,
                       onPressed: () {
                         messenger.hideCurrentSnackBar();
                         context
@@ -91,7 +92,7 @@ class TodosOverviewView extends StatelessWidget {
               } else {
                 return Center(
                   child: Text(
-                    "l10n.todosOverviewEmptyText",
+                    l10n.todosOverviewEmptyText,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 );

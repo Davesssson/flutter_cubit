@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myfirstflutterproject/l10n/l10n.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/bloc/todos_overview_bloc.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/models/todos_view_filter.dart';
 
@@ -8,7 +9,7 @@ class TodosOverviewFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final l10n = context.l10n;
     final activeFilter =
     context.select((TodosOverviewBloc bloc) => bloc.state.filter);
 
@@ -17,25 +18,25 @@ class TodosOverviewFilterButton extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
       initialValue: activeFilter,
-      tooltip: "l10n.todosOverviewFilterTooltip",
+      tooltip: l10n.todosOverviewFilterTooltip,
       onSelected: (filter) {
         context
             .read<TodosOverviewBloc>()
             .add(TodosOverviewFilterChanged(filter));
       },
       itemBuilder: (context) {
-        return const [
+        return  [
           PopupMenuItem(
             value: TodosViewFilter.all,
-            child: Text("l10n.todosOverviewFilterAll"),
+            child: Text(l10n.todosOverviewFilterAll),
           ),
           PopupMenuItem(
             value: TodosViewFilter.activeOnly,
-            child: Text("l10n.todosOverviewFilterActiveOnly"),
+            child: Text(l10n.todosOverviewFilterActiveOnly),
           ),
           PopupMenuItem(
             value: TodosViewFilter.completedOnly,
-            child: Text("l10n.todosOverviewFilterCompletedOnly"),
+            child: Text( l10n.todosOverviewFilterCompletedOnly),
           ),
         ];
       },
