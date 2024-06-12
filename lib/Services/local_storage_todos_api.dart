@@ -46,7 +46,16 @@ class LocalStorageTodosApi extends TodosApi {
           .toList();
       _todoStreamController.add(todos);
     } else {
-      _todoStreamController.add(const []);
+      List<Todo> _mockTodos = [
+        Todo(title: "title1", id: "1", description: "my first description1", isCompleted: false, childIds: ['4'], isSubTodo: false),
+        //Todo(title: "title2", id: "2", description: "my first description2",showSubTodos: false, isCompleted: false),
+        Todo(title: "title3", id: "3", description: "my first description3", isCompleted: false, childIds: ['1'], tags: {'not so important'}, isSubTodo: false),
+        Todo(title: "title4", id: "4", description: "my first description4", isCompleted: true, childIds: ['5'], isSubTodo: true),
+        Todo(title: "title5", id: "5", description: "my first description5", isCompleted: false, tags: {'important'}, isSubTodo: false),
+        //Todo(title: "title6", id: "6", description: "my first description6",showSubTodos: false, isCompleted: false),
+      ];
+      _todoStreamController.add( _mockTodos);
+      //_todoStreamController.add( const[]);
     }
   }
 

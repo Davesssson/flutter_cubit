@@ -43,7 +43,7 @@ class DashboardView extends StatelessWidget {
               NavigationRailDestination(
                 icon: Icon(Icons.person),
                 selectedIcon: Icon(Icons.person),
-                label: Text('Profile'),
+                label: Text('Todos'),
               ),
             ],
           ),

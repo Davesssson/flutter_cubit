@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
 import 'package:myfirstflutterproject/Repositories/todos_repository.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/models/todo.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/models/todos_view_filter.dart';
@@ -18,7 +19,11 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
             super(const TodosOverviewState()) {
          on<TodosOverviewSubscriptionRequested>(_onSubscriptionRequested);
          on<TodosClicked>(_todoClicked);
-         //on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
+         on<TodoSubTodosShow>(_subTodoShow);
+         on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
+         on<TodoAddTagEvent>(_addTagToTodo);
+         on<TodoAddSubTodo>(_TodoAddSubTodo);
+         on<TodoSetTagFilter>(_TodoSetTagFilter);
         // on<TodosOverviewTodoDeleted>(_onTodoDeleted);
         // on<TodosOverviewUndoDeletionRequested>(_onUndoDeletionRequested);
         // on<TodosOverviewFilterChanged>(_onFilterChanged);
@@ -26,6 +31,27 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         // on<TodosOverviewClearCompletedRequested>(_onClearCompletedRequested);
     }
     final TodosRepository _todosRepository;
+
+    List<Todo> getNestedTodos(String parentId) {
+        List<Todo> nestedTodos = [];
+
+        late Todo parentTodo;
+        state.todos.toList().forEach((todo) {
+            if (todo.id == parentId) parentTodo = todo;
+        });
+       //nestedTodos.add(parentTodo);
+        parentTodo.childIds.forEach((id) {
+            state.todos.toList().forEach((todo) {
+                if (todo.id == id) nestedTodos.add(todo);
+            });
+        });
+
+        for (String childId in parentTodo.childIds) {
+            //nestedTodos.addAll(getNestedTodos(childId));
+        }
+
+        return nestedTodos;
+    }
 
     Future<void> _onSubscriptionRequested(
         TodosOverviewSubscriptionRequested event,
@@ -35,9 +61,10 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
 
         await emit.forEach<List<Todo>>(
             _todosRepository.getTodos(),
-            onData: (todos) => state.copyWith(
+            onData: (todos) =>  state.copyWith(
                 status: () => TodosOverviewStatus.success,
                 todos: () => todos,
+                userTodoTags: () => returnSetFromTags(todos)
                 //todos: () => _mockTodos,
             ),
             onError: (_, __) => state.copyWith(
@@ -46,20 +73,94 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         );
     }
 
+    Set<String> returnSetFromTags(List<Todo> todos){
+        Set<String> tags = {};
+        for(var todo in todos) {
+            for(var tag in todo.tags) {
+                tags.add(tag);
+            }
+        }
+        return tags;
+    }
+
+    Future<void> _onTodoCompletionToggled(
+        TodosOverviewTodoCompletionToggled event,
+        Emitter<TodosOverviewState> emit,
+        ) async {
+        final newTodo = event.todo.copyWith(isCompleted: event.isCompleted);
+        List<Todo> list_without_old_todo = [];
+        state.todos.toList().forEach((todo) {
+            if (todo.id != event.todo.id) list_without_old_todo.add(todo);
+        });
+        list_without_old_todo.add(newTodo);
+
+        emit(state.copyWith(todos: () => list_without_old_todo  ));
+        await _todosRepository.saveTodo(newTodo);
+
+    }
+
     Future<void> _todoClicked(
         TodosClicked event,
         Emitter<TodosOverviewState> emit,
         ) async {
         print(" haha buzi vagy ${event.todo.title}");
     }
+
+    Future<void> _subTodoShow(
+        TodoSubTodosShow event,
+        Emitter<TodosOverviewState> emit,
+        ) async {
+
+        List<String> l = state.showChildren.toList();
+        if(l.contains(event.todo.id)){
+            // need to pop it
+            l.remove(event.todo.id);
+        }else
+            // add it
+            l.add(event.todo.id);
+
+        emit(state.copyWith(showChildren: () => l  ));
+
+    }
+
+    Future<void> _addTagToTodo(
+        TodoAddTagEvent event,
+        Emitter<TodosOverviewState> emit,
+        )async{
+        final newTodo = event.todo.copyWith(
+            tags: event.todo.tags.toSet()..add(event.tag));
+        await _todosRepository.saveTodo(newTodo);
+        emit(state.copyWith(userTodoTags: () => state.userTodoTags..toSet().add(event.tag)));
+
+    }
+
+    Future<void> _TodoAddSubTodo(
+        TodoAddSubTodo event,
+        Emitter<TodosOverviewState> emit,
+        )async{
+
+        final newTodo = event.parentTodo.copyWith(childIds: event.parentTodo.childIds.toList()..add(event.subTudo.id));
+        final newTodo2 = event.subTudo;
+        await _todosRepository.saveTodo(newTodo);
+        await _todosRepository.saveTodo(newTodo2);
+    }
+
+    Future<void> _TodoSetTagFilter(
+        TodoSetTagFilter event,
+        Emitter<TodosOverviewState> emit,
+        )async{
+        late Set<String> setTo;
+        if(!state.tagFilter.contains(event.tagFilter)) {
+            final Set<String> a = {event.tagFilter};
+            setTo = {...state.tagFilter, ...a};
+        }else{
+            Set<String> existing = {...state.tagFilter};
+            existing.remove(event.tagFilter);
+            setTo = existing;
+
+        }
+        emit(state.copyWith(tagFilter: () =>setTo));
+
+    }
 }
 
-
-List<Todo> _mockTodos = [
-    Todo(title: "title1", id: "1", description: "my first description1", isCompleted: false),
-    Todo(title: "title2", id: "2", description: "my first description2", isCompleted: false),
-    Todo(title: "title3", id: "3", description: "my first description3", isCompleted: false),
-    Todo(title: "title4", id: "4", description: "my first description4", isCompleted: true),
-    Todo(title: "title5", id: "5", description: "my first description5", isCompleted: false),
-    Todo(title: "title6", id: "6", description: "my first description6", isCompleted: false),
-];

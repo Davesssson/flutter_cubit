@@ -13,6 +13,9 @@ class Todo extends Equatable{
     String? id,
     this.description = "",
     this.isCompleted = false,
+    this.childIds = const [],
+    this.tags = const {},
+    required this.isSubTodo
   }) : assert(
       id == null || id.isNotEmpty , "id must be either be null or not empty"
   ), id = id ?? const Uuid().v4();
@@ -21,18 +24,28 @@ class Todo extends Equatable{
   final String title;
   final String description;
   final bool isCompleted;
+  final bool isSubTodo;
+  final List<String> childIds;
+  final Set<String> tags;
 
   Todo copyWith({
     String? id,
     String? title,
     String? description,
-    bool? isCompleted
+    bool? isCompleted,
+    bool? isSubTodo,
+    List<String>? childIds,
+    Set<String>? tags,
+
   }) {
     return Todo(
         id: id ?? this.id,
         title: title ?? this.title,
         description: description ?? this.description,
         isCompleted: isCompleted ?? this.isCompleted,
+        childIds: childIds ?? this.childIds,
+        tags: tags ?? this.tags,
+        isSubTodo: isSubTodo ?? this.isSubTodo,
     );
   }
 
@@ -41,6 +54,6 @@ class Todo extends Equatable{
 
   @override
   // TODO: implement props
-  List<Object> get props => [id, title, description, isCompleted];
+  List<Object> get props => [id, title, description, isCompleted, childIds, tags];
 
 }
