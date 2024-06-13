@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/bloc/todos_overview_bloc.dart';
@@ -82,6 +84,7 @@ class TodoListTile extends StatelessWidget {
            Row(
              mainAxisAlignment: MainAxisAlignment.start,
              children: [
+               ManageTagButton2(todo),
                ...generateTags(todo, context)
              ],
            ),
@@ -89,25 +92,7 @@ class TodoListTile extends StatelessWidget {
 
            if (show == true)
              if (!isSubTodo)
-                Padding(
-                 padding:  EdgeInsets.fromLTRB(60.0, 0,0,0),
-                 child:  SizedBox(
-                   child: TextField(
-                     controller: controller,
-                     onSubmitted: (text) => {
-                     context
-                         .read<TodosOverviewBloc>()
-                         .add(TodoAddSubTodo( todo, Todo(title: text, isSubTodo: true))),
-                       controller.clear()
-                       
-                     },
-                     decoration: const InputDecoration(
-                       border: OutlineInputBorder(),
-                       labelText: 'Add subtodo',
-                     ),
-                   ),
-                 ),
-               ),
+                AddSubTodoTextField(controller: controller, todo: todo),
           if (show == true)
             for (final todo in subTodos)
                   Padding(
@@ -119,6 +104,108 @@ class TodoListTile extends StatelessWidget {
     );
   }
 }
+
+class AddSubTodoTextField extends StatelessWidget {
+  const AddSubTodoTextField({
+    super.key,
+    required this.controller,
+    required this.todo,
+  });
+
+  final TextEditingController controller;
+  final Todo todo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+     padding:  EdgeInsets.fromLTRB(60.0, 0,0,0),
+     child:  SizedBox(
+       child: TextField(
+         controller: controller,
+         onSubmitted: (text) => {
+         context
+             .read<TodosOverviewBloc>()
+             .add(TodoAddSubTodo( todo, Todo(title: text, isSubTodo: true))),
+           controller.clear()
+
+         },
+         decoration: const InputDecoration(
+           border: OutlineInputBorder(),
+           labelText: 'Add subtodo',
+         ),
+       ),
+     ),
+    );
+  }
+}
+
+
+class ManageTagButton2 extends StatelessWidget {
+  const ManageTagButton2(this.todo,{Key? key}) : super(key: key);
+
+  final Todo todo;
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+    return BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
+        builder: (contextb, stateb) {
+          // return widget here based on BlocA's state
+          return BlocProvider.value(
+            value: BlocProvider.of<TodosOverviewBloc>(contextb),
+            child:ElevatedButton(
+              onPressed: () => showModalBottomSheet(
+            context: context,
+            builder: (innerContext) => BlocProvider.value(
+              value: context.read<TodosOverviewBloc>(),
+              child: Column(
+                children: [
+                  BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
+                    builder: (context, state) {
+                      return Column(
+                        children: [
+                          for(var t in state.todos.where((todo_i) => todo_i.id == todo.id).first.tags)
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                               children: [
+                                 Text(t),
+                                 IconButton(
+                                     onPressed: (){
+                                        print("$t removed");
+                                     },
+                                     icon: Icon(Icons.close))
+                               ],
+                             ),
+                          for (var tag in context.read<TodosOverviewBloc>().state.userTodoTags)
+                            if (!state.todos.where((todo_i) => todo_i.id == todo.id).first.tags.contains(tag))
+                              ElevatedButton(
+                                  onPressed: (){
+                                    context
+                                        .read<TodosOverviewBloc>()
+                                        .add(TodoAddTagEvent(todo, tag));
+                                  },
+                                  child: Text(tag))
+                        ],
+                      );
+                    },
+                  ),
+                  ElevatedButton(
+                    onPressed: () => context.read<TodosOverviewBloc>().add(TodoAddTagEvent(todo, Random().nextInt(10).toString())),
+                    child: const Text('Press me'),
+                  )
+                ],
+              ),
+            ),
+          ),
+          child: Text('Add')),
+
+          );
+        }
+    );
+
+  }
+}
+
+
 
 List<Widget> generateTags(Todo todo, BuildContext context){
   TextEditingController controller = TextEditingController();
@@ -195,7 +282,7 @@ List<Widget> generateTags(Todo todo, BuildContext context){
      
  );
 
-  tagsToReturn.add(b);
+  //tagsToReturn.add(ManageTagButton2(todo));
   if (todo.tags.isEmpty) return tagsToReturn;
   for (final tag in todo.tags) {
     tagsToReturn.add(

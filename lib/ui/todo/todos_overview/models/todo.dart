@@ -26,7 +26,7 @@ class Todo extends Equatable{
   final bool isCompleted;
   final bool isSubTodo;
   final List<String> childIds;
-  final Set<String> tags;
+  Set<String> tags;
 
   Todo copyWith({
     String? id,
