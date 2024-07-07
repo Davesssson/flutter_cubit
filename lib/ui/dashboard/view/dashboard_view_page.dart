@@ -51,7 +51,7 @@ class DashboardView extends StatelessWidget {
           Expanded(
             child: IndexedStack(
               index: selectedTab.index,
-              children: const [Text("asd"),  TodosOverviewPage()],
+              children:  [Text("asd"),  TodosOverviewPage()],
             ),
           ),
         ],

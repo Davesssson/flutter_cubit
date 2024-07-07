@@ -13,16 +13,16 @@ import '../models/todo.dart';
 
 
 class TodosOverviewPage extends StatelessWidget {
-  const TodosOverviewPage({super.key});
+   TodosOverviewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TodosOverviewBloc(
-        todosRepository: context.read<TodosRepository>(),
-      )..add(const TodosOverviewSubscriptionRequested()),
+      create: (context) => BlocProvider.of<TodosOverviewBloc>(context)..add(const TodosOverviewSubscriptionRequested()),
       child: const TodosOverviewView(),
     );
+    //BlocProvider.of<TodosOverviewBloc>(context).add(const TodosOverviewSubscriptionRequested());
+    //return TodosOverviewPage();
   }
 }
 
@@ -85,6 +85,7 @@ class TodosOverviewView extends StatelessWidget {
             },
           ),
         ],
+
         child: BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
           builder: (context, state) {
             if (state.todos.isEmpty) {
