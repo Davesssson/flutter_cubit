@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myfirstflutterproject/Repositories/todos_repository.dart';
 import 'package:myfirstflutterproject/l10n/l10n.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/bloc/todos_overview_bloc.dart';
+import 'package:myfirstflutterproject/ui/todo/todos_overview/widgets/add_todo_fab.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/widgets/todo_list_tile.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/widgets/todos_overview_filter_button.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/widgets/todos_overview_options_button.dart';
@@ -104,66 +105,72 @@ class TodosOverviewView extends StatelessWidget {
             return CupertinoScrollbar(
               child: BlocProvider.value(
                 value: BlocProvider.of<TodosOverviewBloc>(context),
-                child: ListView(
-                  children: [
-                    Row(
-                      children: [
-                        for(final tag in state.userTodoTags)
-                          FilterChip(
-                            selected: state.tagFilter.contains(tag)? true: false,
-                            label:Text(tag),
-                            onSelected: (bool)=>{
+                child: Stack(
+                  children:[
+                    ListView(
+                    children: [
+                      Row(
+                        children: [
+                          for(final tag in state.userTodoTags)
+                            FilterChip(
+                              selected: state.tagFilter.contains(tag)? true: false,
+                              label:Text(tag),
+                              onSelected: (bool)=>{
+                              context
+                                  .read<TodosOverviewBloc>()
+                                  .add(TodoSetTagFilter(tag ))
+                              },
+                            )
+                        ],
+                      ),
+                      for (final todo in state.filteredTodos )
+                       if (state.tagFilteredTodos.contains(todo))
+                          if (todo.isSubTodo == false)
+                            TodoListTile(
+                              isSubTodo: false,
+                              todo: todo,
+                              onToggleCompleted: (isCompleted) {
+                                context
+                                    .read<TodosOverviewBloc>()
+                                    .add(TodosOverviewTodoCompletionToggled(todo: todo, isCompleted: isCompleted));
+                              },
+                              onDismissed: (_) {
+                                context
+                                    .read<TodosOverviewBloc>()
+                                    .add(TodosOverviewTodoDeleted(todo));
+
+                              },
+                              //onTap: () {
+                              //  Navigator.of(context).push(
+                              //    EditTodoPage.route(initialTodo: todo),
+                              //  );
+                              //},
+                              //subTodos:myFunc(todo.childIds, context),
+                              subTodos:myOtherFunction(todo, context),
+                              show: state.showChildren.contains(todo.id),
+
+                           ),
+                      ElevatedButton(
+                          onPressed: (){
                             context
                                 .read<TodosOverviewBloc>()
-                                .add(TodoSetTagFilter(tag ))
-                            },
-                          )
-                      ],
-                    ),
-                    for (final todo in state.filteredTodos )
-                     if (state.tagFilteredTodos.contains(todo))
-                        if (todo.isSubTodo == false)
-                          TodoListTile(
-                            isSubTodo: false,
-                            todo: todo,
-                            onToggleCompleted: (isCompleted) {
-                              context
-                                  .read<TodosOverviewBloc>()
-                                  .add(TodosOverviewTodoCompletionToggled(todo: todo, isCompleted: isCompleted));
-                            },
-                            onDismissed: (_) {
-                              context
-                                  .read<TodosOverviewBloc>()
-                                  .add(TodosOverviewTodoDeleted(todo));
-                
-                            },
-                            //onTap: () {
-                            //  Navigator.of(context).push(
-                            //    EditTodoPage.route(initialTodo: todo),
-                            //  );
-                            //},
-                            //subTodos:myFunc(todo.childIds, context),
-                            subTodos:myOtherFunction(todo, context),
-                            show: state.showChildren.contains(todo.id),
-                
-                         ),
-                    ElevatedButton(
-                        onPressed: (){
-                          context
-                              .read<TodosOverviewBloc>()
-                              .add(TodoAddTagEvent(state.todos[3], "custom tag"));
-                        },
-                        child: Text("Test some feature")
-                    ),
-                    ElevatedButton(
-                        onPressed: (){
-                          context
-                              .read<TodosOverviewBloc>()
-                              .add(TodoAddSubTodo( state.todos[3], Todo(title: "my title", isSubTodo: true)));
-                        },
-                        child: Text("Add subtodo")
-                    )
-                  ],
+                                .add(TodoAddTagEvent(state.todos[3], "custom tag"));
+                          },
+                          child: Text("Test some feature")
+                      ),
+                      ElevatedButton(
+                          onPressed: (){
+                            context
+                                .read<TodosOverviewBloc>()
+                                .add(TodoAddSubTodo( state.todos[3], Todo(title: "my title", isSubTodo: true)));
+                          },
+                          child: Text("Add subtodo")
+                      )
+                    ],
+                  ),
+                    AddTodoFab(),
+
+                  ]
                 ),
               ),
             );

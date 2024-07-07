@@ -23,6 +23,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
          on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
          on<TodoAddTagEvent>(_addTagToTodo);
          on<TodoAddSubTodo>(_TodoAddSubTodo);
+         on<TodoAddTodo>(_TodoAddTodo);
          on<TodoSetTagFilter>(_TodoSetTagFilter);
         // on<TodosOverviewTodoDeleted>(_onTodoDeleted);
         // on<TodosOverviewUndoDeletionRequested>(_onUndoDeletionRequested);
@@ -127,10 +128,26 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         TodoAddTagEvent event,
         Emitter<TodosOverviewState> emit,
         )async{
+        print(event.todo.tags);
+
+        Set<String> tags = {...event.todo.tags, event.tag};
+        print(tags);
         final newTodo = event.todo.copyWith(
-            tags: event.todo.tags.toSet()..add(event.tag));
-        await _todosRepository.saveTodo(newTodo);
-        emit(state.copyWith(userTodoTags: () => state.userTodoTags..toSet().add(event.tag)));
+            tags: tags);
+        print(newTodo.tags);
+
+        if(state.userTodoTags.contains(event.tag)){
+            await _todosRepository.saveTodo(newTodo);
+            emit(state);
+        }else{
+            await _todosRepository.saveTodo(newTodo);
+            emit(
+                state.copyWith(
+                    userTodoTags: () => state.userTodoTags..toSet().add(event.tag),
+                ));
+        }
+        print(state.todos.where((todo_i) => todo_i.id == event.todo.id).first.tags);
+
 
     }
 
@@ -143,6 +160,17 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         final newTodo2 = event.subTudo;
         await _todosRepository.saveTodo(newTodo);
         await _todosRepository.saveTodo(newTodo2);
+    }
+
+    Future<void> _TodoAddTodo(
+        TodoAddTodo event,
+        Emitter<TodosOverviewState> emit,
+        )async{
+
+        final newTodo = Todo(title: event.todoName, isSubTodo: false);
+        //final newTodo2 = event.subTudo;
+        await _todosRepository.saveTodo(newTodo);
+        //await _todosRepository.saveTodo(newTodo2);
     }
 
     Future<void> _TodoSetTagFilter(

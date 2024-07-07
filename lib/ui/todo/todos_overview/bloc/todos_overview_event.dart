@@ -97,3 +97,11 @@ class TodoSetTagFilter extends TodosOverviewEvent {
   List<Object> get props => [tagFilter];
 }
 
+class TodoAddTodo extends TodosOverviewEvent {
+const TodoAddTodo(this.todoName);
+
+final String todoName;
+@override
+List<Object> get props => [todoName];
+}
+
