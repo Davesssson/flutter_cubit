@@ -13,6 +13,7 @@ class AddNewTodoBloc extends Bloc<AddNewTodoEvent, AddNewTodoState> {
     selectedTags: []
   )){
     on<TodoAddNewTodoTag>(_addTagToNewTodo);
+    on<TodoAddNewTodoSetName>(setTodoName);
   }
 
   Future<void> _addTagToNewTodo(
@@ -27,6 +28,16 @@ class AddNewTodoBloc extends Bloc<AddNewTodoEvent, AddNewTodoState> {
     emit(state.copyWith(selectedTags: ()=> updatedTags));
     print("ez van masodijara");
     print(state.selectedTags);
+
+  }
+
+  Future<void> setTodoName(
+      TodoAddNewTodoSetName event,
+      Emitter<AddNewTodoState> emit,
+      ) async {
+
+    String name = event.name;
+    emit(state.copyWith(todoName: event.name));
 
   }
 }

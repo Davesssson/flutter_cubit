@@ -36,10 +36,14 @@ class AddTodoFab extends StatelessWidget {
                         SizedBox(
                           child: TextField(
                             controller: controller,
-                            onSubmitted: (text) {
+                            onChanged: (text) {
                               context
-                                  .read<TodosOverviewBloc>()
-                                  .add(TodoAddTodo(text));
+                                  .read<AddNewTodoBloc>()
+                                  .add(TodoAddNewTodoSetName(text));
+                              //controller.clear();
+                            },
+                            onSubmitted: (bool) {
+                              overviewBloc.add(TodoAddTodo(controller.text, addNewTodoBloc.state.selectedTags));
                               controller.clear();
                             },
                             decoration: const InputDecoration(

@@ -17,3 +17,11 @@ class TodoAddNewTodoTag extends AddNewTodoEvent {
   @override
   List<Object> get props => [tag];
 }
+
+class TodoAddNewTodoSetName extends AddNewTodoEvent {
+  const TodoAddNewTodoSetName(this.name);
+  final String name;
+
+  @override
+  List<Object> get props => [name];
+}

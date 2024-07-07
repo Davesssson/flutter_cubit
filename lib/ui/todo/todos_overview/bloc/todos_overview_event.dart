@@ -98,10 +98,11 @@ class TodoSetTagFilter extends TodosOverviewEvent {
 }
 
 class TodoAddTodo extends TodosOverviewEvent {
-const TodoAddTodo(this.todoName);
+const TodoAddTodo(this.todoName, this.tags);
 
 final String todoName;
+final List<String> tags;
 @override
-List<Object> get props => [todoName];
+List<Object> get props => [todoName, tags];
 }
 

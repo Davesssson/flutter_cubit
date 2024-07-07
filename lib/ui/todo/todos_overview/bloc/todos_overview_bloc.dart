@@ -167,7 +167,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         Emitter<TodosOverviewState> emit,
         )async{
 
-        final newTodo = Todo(title: event.todoName, isSubTodo: false);
+        final newTodo = Todo(title: event.todoName, isSubTodo: false, tags: event.tags.toSet());
         //final newTodo2 = event.subTudo;
         await _todosRepository.saveTodo(newTodo);
         //await _todosRepository.saveTodo(newTodo2);
