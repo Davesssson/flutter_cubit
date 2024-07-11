@@ -147,54 +147,56 @@ class ManageTagButton2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController controller = TextEditingController();
+    final overviewBloc = BlocProvider.of<TodosOverviewBloc>(context);
+
     return BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
-        builder: (contextb, stateb) {
-          // return widget here based on BlocA's state
+        builder: (contextb, state) {
           return BlocProvider.value(
-            value: BlocProvider.of<TodosOverviewBloc>(contextb),
+            value: BlocProvider.of<TodosOverviewBloc>(context),
             child:ElevatedButton(
               onPressed: () => showModalBottomSheet(
             context: context,
-            builder: (innerContext) => BlocProvider.value(
-              value: context.read<TodosOverviewBloc>(),
-              child: Column(
-                children: [
+            builder: (context) {
+              return BlocProvider.value(
+              value: overviewBloc,
+              child:
+
                   BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
                     builder: (context, state) {
                       return Column(
                         children: [
-                          for(var t in state.todos.where((todo_i) => todo_i.id == todo.id).first.tags)
+                          for(final t in state.todos.firstWhere((t) =>t.id == todo.id).tags)
                              Row(
                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                children: [
                                  Text(t),
                                  IconButton(
                                      onPressed: (){
+                                       overviewBloc.add(TodoRemoveTagEvent(todo, t));
                                         print("$t removed");
                                      },
                                      icon: Icon(Icons.close))
                                ],
                              ),
-                          for (var tag in context.read<TodosOverviewBloc>().state.userTodoTags)
-                            if (!state.todos.where((todo_i) => todo_i.id == todo.id).first.tags.contains(tag))
+                          for (final tag in overviewBloc.state.userTodoTags)
+                            if (!state.todos.firstWhere((t) =>t.id == todo.id).tags.contains(tag) )
+                            //if (!overviewBloc.state.todos.where((todo_i) => todo_i.id == todo.id).tags.contains(tag))
                               ElevatedButton(
                                   onPressed: (){
-                                    context
-                                        .read<TodosOverviewBloc>()
+                                    overviewBloc
                                         .add(TodoAddTagEvent(todo, tag));
                                   },
-                                  child: Text(tag))
+                                  child: Text(tag)
+                              ),
+                          ElevatedButton(
+                            onPressed: () => overviewBloc.add(TodoAddTagEvent(todo, Random().nextInt(10).toString())),
+                            child: const Text('Press me'),
+                          )
                         ],
                       );
                     },
                   ),
-                  ElevatedButton(
-                    onPressed: () => context.read<TodosOverviewBloc>().add(TodoAddTagEvent(todo, Random().nextInt(10).toString())),
-                    child: const Text('Press me'),
-                  )
-                ],
-              ),
-            ),
+            );}
           ),
           child: Text('Add')),
 
@@ -300,4 +302,55 @@ List<Widget> generateTags(Todo todo, BuildContext context){
     );
   }
   return tagsToReturn;
+}
+
+
+class ManageTagButton3 extends StatelessWidget {
+  const ManageTagButton3(this.todo,{Key? key}) : super(key: key);
+
+  final Todo todo;
+
+  @override
+  Widget build(BuildContext context) {
+    final overviewBloc = BlocProvider.of<TodosOverviewBloc>(context);
+
+    return ElevatedButton(
+      child: Icon(Icons.add),
+      onPressed: () {
+        showModalBottomSheet(
+          constraints: const BoxConstraints(
+            minHeight: 100,
+            minWidth: 100,
+          ),
+          context: context,
+          builder: (context) {
+            return BlocProvider.value(
+              value: overviewBloc,
+              child: BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      const Text("Added tags "),
+                      for (final tag in overviewBloc.state.todos.singleWhere((t)=> t.id == todo.id).tags)
+                        Text(tag),
+                      const Text("These can be added"),
+                      for (final tag in overviewBloc.state.userTodoTags)
+                        FilterChip(
+                          selected: todo.tags.contains(tag),
+                          label: Text(tag),
+                          onSelected: (isSelected) {
+                            overviewBloc
+                                .add(TodoAddTagEvent(todo,tag));
+                          },
+                        ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }

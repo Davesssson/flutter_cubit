@@ -80,6 +80,15 @@ class TodoAddTagEvent extends TodosOverviewEvent {
   List<Object> get props => [todo, tag];
 }
 
+class TodoRemoveTagEvent extends TodosOverviewEvent {
+  const TodoRemoveTagEvent(this.todo, this.tag);
+
+  final Todo todo;
+  final String tag;
+  @override
+  List<Object> get props => [todo, tag];
+}
+
   class TodoAddSubTodo extends TodosOverviewEvent {
   const TodoAddSubTodo(this.parentTodo, this.subTudo);
 

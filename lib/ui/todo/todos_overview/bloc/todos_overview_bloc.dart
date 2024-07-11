@@ -22,6 +22,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
          on<TodoSubTodosShow>(_subTodoShow);
          on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
          on<TodoAddTagEvent>(_addTagToTodo);
+         on<TodoRemoveTagEvent>(_removeTagFromTodo);
          on<TodoAddSubTodo>(_TodoAddSubTodo);
          on<TodoAddTodo>(_TodoAddTodo);
          on<TodoSetTagFilter>(_TodoSetTagFilter);
@@ -128,28 +129,66 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         TodoAddTagEvent event,
         Emitter<TodosOverviewState> emit,
         )async{
-        print(event.todo.tags);
+        //print(event.todo.tags);
+//
+        //Set<String> tags = {...event.todo.tags, event.tag};
+        //print(tags);
+        //final newTodo = event.todo.copyWith(
+        //    tags: tags);
+        //print(newTodo.tags);
+//
+        //if(state.userTodoTags.contains(event.tag)){
+        //    await _todosRepository.saveTodo(newTodo);
+        //    emit(state);
+        //}else{
+        //    await _todosRepository.saveTodo(newTodo);
+        //    emit(
+        //        state.copyWith(
+        //            userTodoTags: () => state.userTodoTags..toSet().add(event.tag),
+        //        ));
+        //}
+        //print(state.todos.where((todo_i) => todo_i.id == event.todo.id).first.tags);
+        Set<String> updatedTags = Set.from(state.todos.singleWhere((t)=> t.id == event.todo.id).tags);
+        updatedTags.add(event.tag);
 
-        Set<String> tags = {...event.todo.tags, event.tag};
-        print(tags);
-        final newTodo = event.todo.copyWith(
-            tags: tags);
-        print(newTodo.tags);
-
-        if(state.userTodoTags.contains(event.tag)){
-            await _todosRepository.saveTodo(newTodo);
-            emit(state);
-        }else{
-            await _todosRepository.saveTodo(newTodo);
-            emit(
-                state.copyWith(
-                    userTodoTags: () => state.userTodoTags..toSet().add(event.tag),
-                ));
-        }
-        print(state.todos.where((todo_i) => todo_i.id == event.todo.id).first.tags);
-
+        _todosRepository.saveTodo(event.todo.copyWith(tags: updatedTags));
+        //emit(state.copyWith(todos:()=> state.todos));
 
     }
+
+    Future<void> _removeTagFromTodo(
+        TodoRemoveTagEvent event,
+        Emitter<TodosOverviewState> emit,
+        )async{
+        //print(event.todo.tags);
+//
+        //Set<String> tags = {...event.todo.tags, event.tag};
+        //print(tags);
+        //final newTodo = event.todo.copyWith(
+        //    tags: tags);
+        //print(newTodo.tags);
+//
+        //if(state.userTodoTags.contains(event.tag)){
+        //    await _todosRepository.saveTodo(newTodo);
+        //    emit(state);
+        //}else{
+        //    await _todosRepository.saveTodo(newTodo);
+        //    emit(
+        //        state.copyWith(
+        //            userTodoTags: () => state.userTodoTags..toSet().add(event.tag),
+        //        ));
+        //}
+        //print(state.todos.where((todo_i) => todo_i.id == event.todo.id).first.tags);
+        Set<String> updatedTags = Set.from(state.todos.singleWhere((t)=> t.id == event.todo.id).tags);
+        updatedTags.remove(event.tag);
+
+        _todosRepository.saveTodo(event.todo.copyWith(tags: updatedTags));
+        //emit(state.copyWith(todos:()=> state.todos));
+
+    }
+
+
+
 
     Future<void> _TodoAddSubTodo(
         TodoAddSubTodo event,
