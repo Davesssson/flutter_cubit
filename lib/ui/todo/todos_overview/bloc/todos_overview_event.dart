@@ -110,8 +110,15 @@ class TodoAddTodo extends TodosOverviewEvent {
 const TodoAddTodo(this.todoName, this.tags);
 
 final String todoName;
-final List<String> tags;
+final Set<String> tags;
 @override
 List<Object> get props => [todoName, tags];
 }
 
+class TodoAddTagToNewTodo extends TodosOverviewEvent {
+const TodoAddTagToNewTodo(this.tag);
+
+final String tag;
+@override
+List<Object> get props => [ tag];
+}

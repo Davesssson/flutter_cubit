@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myfirstflutterproject/ui/todo/add_new_todo_bottom_sheet/bloc/add_new_todo_bloc.dart';
-import 'package:myfirstflutterproject/ui/todo/add_new_todo_bottom_sheet/bloc/add_new_todo_event.dart';
-import 'package:myfirstflutterproject/ui/todo/add_new_todo_bottom_sheet/bloc/add_new_todo_state.dart';
 import '../bloc/todos_overview_bloc.dart';
 
 class AddTodoFab extends StatelessWidget {
@@ -12,7 +9,6 @@ class AddTodoFab extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController controller = TextEditingController();
     final overviewBloc = BlocProvider.of<TodosOverviewBloc>(context);
-    final addNewTodoBloc = BlocProvider.of<AddNewTodoBloc>(context);
 
     return Positioned(
       bottom: 10,
@@ -28,22 +24,16 @@ class AddTodoFab extends StatelessWidget {
             context: context,
             builder: (context) {
               return BlocProvider.value(
-                value: addNewTodoBloc,
-                child: BlocBuilder<AddNewTodoBloc, AddNewTodoState>(
+                value: overviewBloc,
+                child: BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
                   builder: (context, state) {
                     return Column(
                       children: [
                         SizedBox(
                           child: TextField(
                             controller: controller,
-                            onChanged: (text) {
-                              context
-                                  .read<AddNewTodoBloc>()
-                                  .add(TodoAddNewTodoSetName(text));
-                              //controller.clear();
-                            },
                             onSubmitted: (bool) {
-                              overviewBloc.add(TodoAddTodo(controller.text, addNewTodoBloc.state.selectedTags));
+                              overviewBloc.add(TodoAddTodo(controller.text, state.newTodoSelectedTags));
                               controller.clear();
                             },
                             decoration: const InputDecoration(
@@ -53,25 +43,14 @@ class AddTodoFab extends StatelessWidget {
                           ),
                         ),
                         const Text("Add tags now"),
-                        ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<AddNewTodoBloc>()
-                                .add(const TodoAddNewTodoTag("asdasd"));
-                          },
-                          child: Text("asd"),
-                        ),
                         for (final tag in overviewBloc.state.userTodoTags)
                           FilterChip(
-                            selected: state.selectedTags.contains(tag),
+                            selected: state.newTodoSelectedTags.contains(tag),
                             label: Text(tag),
                             onSelected: (isSelected) {
-                              context
-                                  .read<AddNewTodoBloc>()
-                                  .add(TodoAddNewTodoTag(tag));
+                              overviewBloc.add(TodoAddTagToNewTodo(tag));
                             },
                           ),
-                        for (final tag in state.selectedTags) Text(tag),
                       ],
                     );
                   },

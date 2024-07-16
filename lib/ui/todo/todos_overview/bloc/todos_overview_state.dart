@@ -13,7 +13,8 @@ final class TodosOverviewState extends Equatable{
     this.tagFilter = const {},
     this.lastDeletedTodo,
     this.showChildren = const [],
-    this.userTodoTags = const {}
+    this.userTodoTags = const {},
+    this.newTodoSelectedTags = const {}
   });
 
   final TodosOverviewStatus status;
@@ -23,6 +24,7 @@ final class TodosOverviewState extends Equatable{
   final Todo? lastDeletedTodo;
   final List<String> showChildren;
   final Set<String> userTodoTags;
+  final Set<String> newTodoSelectedTags;
 
 Iterable<Todo> get filteredTodos => filter.applyAll(todos);
 
@@ -47,7 +49,8 @@ Iterable<Todo> get tagFilteredTodos  {
     Set<String> Function()? tagFilter,
     Todo? Function()? lastDeletedTodo,
     List<String> Function()? showChildren,
-    Set<String> Function()? userTodoTags
+    Set<String> Function()? userTodoTags,
+    Set<String> Function()? newTodoSelectedTags
   }) {
     return TodosOverviewState(
       status: status != null ? status() : this.status,
@@ -57,10 +60,11 @@ Iterable<Todo> get tagFilteredTodos  {
       lastDeletedTodo: lastDeletedTodo != null ? lastDeletedTodo() : this.lastDeletedTodo,
       showChildren: showChildren != null ? showChildren(): this.showChildren,
       userTodoTags: userTodoTags != null ? userTodoTags(): this.userTodoTags,
+      newTodoSelectedTags: newTodoSelectedTags != null ? newTodoSelectedTags(): this.newTodoSelectedTags,
     );
   }
 
   @override
-  List<Object?> get props => [status, todos, filter, lastDeletedTodo, showChildren,userTodoTags, tagFilter];
+  List<Object?> get props => [status, todos, filter, lastDeletedTodo, showChildren,userTodoTags, tagFilter, newTodoSelectedTags];
 
 }

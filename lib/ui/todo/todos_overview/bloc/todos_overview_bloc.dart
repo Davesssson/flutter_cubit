@@ -26,6 +26,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
          on<TodoAddSubTodo>(_TodoAddSubTodo);
          on<TodoAddTodo>(_TodoAddTodo);
          on<TodoSetTagFilter>(_TodoSetTagFilter);
+         on<TodoAddTagToNewTodo>(_TodoAddTagToNewTodo);
         // on<TodosOverviewTodoDeleted>(_onTodoDeleted);
         // on<TodosOverviewUndoDeletionRequested>(_onUndoDeletionRequested);
         // on<TodosOverviewFilterChanged>(_onFilterChanged);
@@ -208,6 +209,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
 
         final newTodo = Todo(title: event.todoName, isSubTodo: false, tags: event.tags.toSet());
         //final newTodo2 = event.subTudo;
+        emit(state.copyWith(newTodoSelectedTags: () => {}));
         await _todosRepository.saveTodo(newTodo);
         //await _todosRepository.saveTodo(newTodo2);
     }
@@ -227,6 +229,24 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
 
         }
         emit(state.copyWith(tagFilter: () =>setTo));
+
+    }
+
+    Future<void> _TodoAddTagToNewTodo(
+        TodoAddTagToNewTodo event,
+        Emitter<TodosOverviewState> emit,
+        )async{
+        late Set<String> setTo;
+        if(!state.newTodoSelectedTags.contains(event.tag)) {
+            final Set<String> a = {event.tag};
+            setTo = {...state.newTodoSelectedTags, ...a};
+        }else{
+            Set<String> existing = {...state.newTodoSelectedTags};
+            existing.remove(event.tag);
+            setTo = existing;
+
+        }
+        emit(state.copyWith(newTodoSelectedTags: () =>setTo));
 
     }
 }

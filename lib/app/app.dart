@@ -6,7 +6,6 @@ import 'package:myfirstflutterproject/ui/dashboard/dashboard.dart';
 import 'package:bloc/bloc.dart';
 import 'package:myfirstflutterproject/ui/todo/todos_overview/bloc/todos_overview_bloc.dart';
 import '../l10n/app_localizations.dart';
-import '../ui/todo/add_new_todo_bottom_sheet/bloc/add_new_todo_bloc.dart';
 
 
 
@@ -36,9 +35,6 @@ class AppView extends StatelessWidget{
       supportedLocales: AppLocalizations.supportedLocales,
       home:  MultiBlocProvider(
         providers: [
-          BlocProvider<AddNewTodoBloc>(
-            create: (context) => AddNewTodoBloc(),
-          ),
           BlocProvider<TodosOverviewBloc>(
             create: (context) => TodosOverviewBloc(todosRepository: tr)
           ),
